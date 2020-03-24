@@ -19,7 +19,41 @@ connection.connect((err) => {
     console.log(`connected as id ${connection.threadId}`);
 })
 
-connection.query('SELECT * FROM employee', (err, result) => {
-    if (err) throw err;
-    console.log(result);
-})
+inquirer.prompt([{
+    message: 'What would you like to do?',
+    type: 'list',
+    name: 'choice',
+    choices: [
+        'View All Employees',
+        'View All Employees by Department',
+        'View All Employees by Manager',
+        'View All Employees by Role',
+        'Add Employee',
+        'Remove Employee',
+        'Update Employee',
+        'View All Roles',
+        'Add Role',
+        'Update Role',
+        'Delete Role',
+        'View All Departments',
+        'Add Department',
+        'Update Department',
+        'Delete Department'
+    ]
+}])
+    .then((answers) => {
+        if (answers.choice === 'View All Employees') {
+            connection.query(`SELECT employee.first_name, 
+            employee.last_name,
+            role.title AS Title,
+            role.salary AS Salary,
+            department.name AS Department
+        FROM employee 
+            INNER JOIN role ON employee.role_id=role.role_id
+            INNER JOIN department ON employee.role_id=department.department_id`, (err, result) => {
+                if (err) throw err;
+                console.table(result);
+            })
+        }
+    })
+
