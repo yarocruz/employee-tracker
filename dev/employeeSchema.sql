@@ -27,3 +27,13 @@ CREATE TABLE employee (
     FOREIGN KEY (manager_id) REFERENCES department(department_id)
 )
 
+--SELECTS and JOINS the id's from the Role and Department tables together into one result.
+SELECT employee.first_name, 
+	employee.last_name,
+	role.title AS Title,
+    role.salary AS Salary,
+    department.name AS Department
+FROM employee 
+	INNER JOIN role ON employee.role_id=role.role_id
+    INNER JOIN department ON employee.role_id=department.department_id
+
