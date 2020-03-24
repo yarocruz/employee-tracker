@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS employee_DB;
+
+CREATE DATABASE employee_DB;
+
 USE employee_DB;
 
 CREATE TABLE department (
@@ -22,7 +26,4 @@ CREATE TABLE employee (
     FOREIGN KEY (role_id) REFERENCES role(role_id),
     FOREIGN KEY (manager_id) REFERENCES department(department_id)
 )
-
-
-
 
