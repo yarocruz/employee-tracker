@@ -43,7 +43,14 @@ inquirer.prompt([{
 }])
     .then((answers) => {
         if (answers.choice === 'View All Employees') {
-            connection.query(`SELECT employee.first_name, 
+            viewAllEmployees();
+        }
+    })
+
+// SQL QUERY FUNCTIONS
+
+function viewAllEmployees() {
+    connection.query(`SELECT employee.first_name, 
             employee.last_name,
             role.title AS Title,
             role.salary AS Salary,
@@ -51,9 +58,68 @@ inquirer.prompt([{
         FROM employee 
             INNER JOIN role ON employee.role_id=role.role_id
             INNER JOIN department ON employee.role_id=department.department_id`, (err, result) => {
-                if (err) throw err;
-                console.table(result);
-            })
-        }
+        if (err) throw err;
+        console.table(result);
     })
+}
+
+function viewByDept() {
+
+}
+
+function viewByManger() {
+
+}
+
+function viewByRole() {
+
+}
+
+function addEmployee() {
+
+}
+
+function updateEmployee() {
+
+}
+
+function removeEmployee() {
+
+}
+
+function viewRoles() {
+
+}
+
+function addRole() {
+
+}
+
+function updateRole() {
+
+}
+
+function deleteRole() {
+
+}
+
+function viewDepts() {
+
+}
+
+function addDept() {
+
+}
+
+function updateDept() {
+
+}
+
+function deleteDept() {
+
+}
+
+// SQL QUERY FUNCTIONS -- /END
+
+
 
