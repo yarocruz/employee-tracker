@@ -44,6 +44,12 @@ inquirer.prompt([{
     .then((answers) => {
         if (answers.choice === 'View All Employees') {
             viewAllEmployees();
+        } else if (answers.choice === 'View All Employees by Department') {
+            viewByDept();
+        } else if (answers.choice === 'View All Employees by Role') {
+            viewByRole();
+        } else if (answers.choice === 'Add Employee') {
+            addEmployee();
         }
     })
 
@@ -64,19 +70,98 @@ function viewAllEmployees() {
 }
 
 function viewByDept() {
-
+    inquirer.prompt([{
+        message: "Which department would you like to view?",
+        type: 'list',
+        name: 'dept',
+        choices: [
+            'Engineering',
+            'Management',
+            'Marketing',
+            'Legal',
+            'Sales'
+        ]
+    }])
+        .then((answers) => {
+            connection.query(`SELECT 
+            employee.first_name,
+            employee.last_name,
+            department.name AS Department
+        FROM employee
+            INNER JOIN role ON employee.role_id=role.role_id     
+            INNER JOIN department ON employee.role_id=department.department_id
+            WHERE department.name='${answers.dept}'`, (err, result) => {
+                if (err) throw err;
+                console.table(result);
+            })
+        })
 }
 
-function viewByManger() {
+function viewByManager() {
 
 }
 
 function viewByRole() {
-
+    inquirer.prompt([{
+        message: "Which roles would you like to view?",
+        type: 'list',
+        name: 'role',
+        choices: [
+            'Junior Developer',
+            'Senior Developer',
+            'Sales Lead',
+            'Lawyer'
+        ]
+    }])
+        .then((answers) => {
+            connection.query(`SELECT 
+            employee.first_name,
+            employee.last_name,
+            role.title AS Title
+        FROM employee
+            INNER JOIN role ON employee.role_id=role.role_id     
+            INNER JOIN department ON employee.role_id=department.department_id
+            WHERE role.title='${answers.role}'`, (err, result) => {
+                if (err) throw err;
+                console.table(result);
+            })
+        })
 }
 
 function addEmployee() {
+    inquirer.prompt([
+        {
+            message: "What would be the employee's role?",
+            type: 'list',
+            name: 'role',
+            choices: [
+                'Junior Developer',
+                'Senior Developer',
+                'Sales Lead',
+                'Lawyer'
+            ]
+        },
+        {
+            message: "What is the employees first name?",
+            type: 'input',
+            name: 'firstName',
+        },
+        {
+            message: "What is the employees last name?",
+            type: 'input',
+            name: 'lastName',
+        },
 
+    ])
+        .then((answers) => {
+            connection.query(`
+            
+            INSERT INTO employee (first_name, last_name, role_id) VALUES ("${answers.firstName}","${answers.lastName}", '${answers.role.indexOf(role)}');`,
+                (err, result) => {
+                    if (err) throw err;
+                    console.table(result);
+                })
+        })
 }
 
 function updateEmployee() {
