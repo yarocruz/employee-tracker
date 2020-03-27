@@ -2,7 +2,6 @@ const inquirer = require('inquirer');
 const mysql = require('mysql');
 const consoleTable = require('console.table');
 
-
 const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -129,17 +128,21 @@ function viewByRole() {
 }
 
 function addEmployee() {
+
+    // Solution so far to be able to reference an index for when choosing an employee role
+    roles = [
+        'Junior Developer',
+        'Senior Developer',
+        'Sales Lead',
+        'Lawyer'
+    ];
+
     inquirer.prompt([
         {
             message: "What would be the employee's role?",
             type: 'list',
             name: 'role',
-            choices: [
-                'Junior Developer',
-                'Senior Developer',
-                'Sales Lead',
-                'Lawyer'
-            ]
+            choices: roles
         },
         {
             message: "What is the employees first name?",
@@ -154,13 +157,20 @@ function addEmployee() {
 
     ])
         .then((answers) => {
+
             connection.query(`
-            
-            INSERT INTO employee (first_name, last_name, role_id) VALUES ("${answers.firstName}","${answers.lastName}", '${answers.role.indexOf(role)}');`,
+             INSERT INTO employee SET ?`,
+                {
+                    first_name: answers.firstName,
+                    last_name: answers.lastName,
+                    role_id: roles.indexOf(answers.role) + 1 // This line has to be an INT
+                },
+
                 (err, result) => {
                     if (err) throw err;
                     console.table(result);
                 })
+            console.log(answers.role);
         })
 }
 
