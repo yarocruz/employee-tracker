@@ -1,6 +1,8 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
 const consoleTable = require('console.table');
+const chalk = require('chalk');
+const figlet = require('figlet');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -16,6 +18,18 @@ connection.connect((err) => {
         return
     }
     console.log(`connected as id ${connection.threadId}`);
+
+    // ASCII ART IS BEING ADDED WITH THE BELOW PACKAGE
+
+
+    figlet('EMPLOYEE TRACKER', function (err, data) {
+        if (err) {
+            console.log('Something went wrong...');
+            console.dir(err);
+            return;
+        }
+        console.log(chalk.green(data))
+    });
 })
 
 inquirer.prompt([{
