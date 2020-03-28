@@ -18,9 +18,11 @@ connection.connect((err) => {
         return
     }
     console.log(`connected as id ${connection.threadId}`);
+})
+
+function initialPrompt() {
 
     // ASCII ART IS BEING ADDED WITH THE BELOW PACKAGE
-
 
     figlet('EMPLOYEE TRACKER', function (err, data) {
         if (err) {
@@ -30,41 +32,58 @@ connection.connect((err) => {
         }
         console.log(chalk.green(data))
     });
-})
 
-inquirer.prompt([{
-    message: 'What would you like to do?',
-    type: 'list',
-    name: 'choice',
-    choices: [
-        'View All Employees',
-        'View All Employees by Department',
-        'View All Employees by Manager',
-        'View All Employees by Role',
-        'Add Employee',
-        'Remove Employee',
-        'Update Employee',
-        'View All Roles',
-        'Add Role',
-        'Update Role',
-        'Delete Role',
-        'View All Departments',
-        'Add Department',
-        'Update Department',
-        'Delete Department'
-    ]
-}])
-    .then((answers) => {
-        if (answers.choice === 'View All Employees') {
-            viewAllEmployees();
-        } else if (answers.choice === 'View All Employees by Department') {
-            viewByDept();
-        } else if (answers.choice === 'View All Employees by Role') {
-            viewByRole();
-        } else if (answers.choice === 'Add Employee') {
-            addEmployee();
-        }
-    })
+    inquirer.prompt([{
+        message: 'What would you like to do?',
+        type: 'list',
+        name: 'choice',
+        choices: [
+            'View All Employees',
+            'View All Employees by Department',
+            'View All Employees by Role',
+            // 'View All Employees by Manager', -- Will add later
+            'Add Employee',
+            'Add Role',
+            'Add Department',
+            // 'Remove Employee', --Will add later
+            'Update Employee Role',
+            'View All Roles',
+            // 'Update Role', --Will add later
+            // 'Delete Role', --Will add later
+            'View All Departments',
+            // 'Update Department', --Will add later
+            // 'Delete Department' --Will add later
+            'Exit Program'
+        ]
+    }])
+        .then((answers) => {
+            if (answers.choice === 'View All Employees') {
+                viewAllEmployees();
+            } else if (answers.choice === 'View All Employees by Department') {
+                viewByDept();
+            } else if (answers.choice === 'View All Employees by Role') {
+                viewByRole();
+            } else if (answers.choice === 'Add Employee') {
+                addEmployee();
+            } else if (answers.choice === 'Add Role') {
+                addRole();
+            } else if (answers.choice === 'Add Department') {
+                addDept();
+            } else if (answers.choice === 'Update Employee Role') {
+                updateEmployeeRole();
+            } else if (answers.choice === 'View All Roles') {
+                viewRoles();
+            } else if (answers.choice === 'View All Departments') {
+                viewDepts();
+            }
+
+            else if (answers.choice === 'Exit Program') {
+                exit();
+            }
+        })
+}
+
+initialPrompt();
 
 // SQL QUERY FUNCTIONS
 
@@ -79,7 +98,9 @@ function viewAllEmployees() {
             INNER JOIN department ON employee.role_id=department.department_id`, (err, result) => {
         if (err) throw err;
         console.table(result);
+
     })
+    initialPrompt();
 }
 
 function viewByDept() {
@@ -106,13 +127,16 @@ function viewByDept() {
             WHERE department.name='${answers.dept}'`, (err, result) => {
                 if (err) throw err;
                 console.table(result);
+
             })
+            initialPrompt();
         })
-}
-
-function viewByManager() {
 
 }
+
+// function viewByManager() {
+
+// }
 
 function viewByRole() {
     inquirer.prompt([{
@@ -122,8 +146,10 @@ function viewByRole() {
         choices: [
             'Junior Developer',
             'Senior Developer',
+            'Manager',
             'Sales Lead',
-            'Lawyer'
+            'Lawyer',
+            'Designer'
         ]
     }])
         .then((answers) => {
@@ -137,18 +163,23 @@ function viewByRole() {
             WHERE role.title='${answers.role}'`, (err, result) => {
                 if (err) throw err;
                 console.table(result);
+
             })
+            initialPrompt();
         })
+
 }
 
 function addEmployee() {
 
     // Solution so far to be able to reference an index for when choosing an employee role
-    roles = [
+    let roles = [
         'Junior Developer',
         'Senior Developer',
+        'Manager',
         'Sales Lead',
-        'Lawyer'
+        'Lawyer',
+        'Designer'
     ];
 
     inquirer.prompt([
@@ -182,51 +213,154 @@ function addEmployee() {
 
                 (err, result) => {
                     if (err) throw err;
-                    console.table(result);
+                    //console.table(result);
                 })
             console.log(answers.role);
+
         })
-}
-
-function updateEmployee() {
-
-}
-
-function removeEmployee() {
-
-}
-
-function viewRoles() {
+    initialPrompt();
 
 }
 
 function addRole() {
+    inquirer.prompt([
+        {
+            message: "What is the name of the role you wish to add?",
+            type: 'input',
+            name: 'newRole'
+        },
+        {
+            message: "What is the yearly salary of the role?",
+            type: 'input',
+            name: 'salary'
+        },
+    ]).then((answers) => {
+        connection.query(`
+             INSERT INTO role SET ?`,
+            {
+                title: answers.newRole,
+                salary: answers.salary,
+            },
+            (err, result) => {
+                if (err) throw err;
 
-}
+            })
 
-function updateRole() {
-
-}
-
-function deleteRole() {
-
-}
-
-function viewDepts() {
-
+    })
+    exit();
 }
 
 function addDept() {
+    inquirer.prompt([
+        {
+            message: "What is the name of the Department?",
+            type: 'input',
+            name: 'newDept'
+        },
+    ])
+        .then(answers => {
+            connection.query(`
+             INSERT INTO department SET ?`,
+                {
+                    name: answers.newDept,
+                },
+                (err, result) => {
+                    if (err) throw err;
+
+                })
+
+        })
+    exit();
+}
+
+function updateEmployeeRole() {
+    let employees = [
+        'Jerry Seinfeld',
+        'George Constanza',
+        'Elaine Benes',
+        'Cosmo Kramer',
+        'Rachel Green',
+        'Phoebe Boufay',
+        'Chandler Bing',
+        'Joey Tribiani',
+        'Ross Gellar',
+        'Monica Gellar'
+    ];
+
+    let roles = [
+        'Junior Developer',
+        'Senior Developer',
+        'Manager',
+        'Sales Lead',
+        'Lawyer',
+    ];
+
+    inquirer.prompt([
+        {
+            message: "Which Employee do you wish to update?",
+            type: 'list',
+            name: 'employee',
+            choices: employees
+        },
+        {
+            message: "What is his/her new role?",
+            type: 'list',
+            name: 'role',
+            choices: roles
+        }
+    ])
+        .then(answers => {
+            connection.query(`
+            UPDATE employee_DB.employee 
+            SET role_id = '${roles.indexOf(answers.role) + 1}' WHERE (employee_id = '${employees.indexOf(answers.employee) + 1}');`,
+                (err, result) => {
+                    if (err) throw err;
+                    console.log(result);
+                })
+
+        })
 
 }
 
-function updateDept() {
-
+function viewRoles() {
+    connection.query(`SELECT * FROM employee_DB.role`, (err, result) => {
+        if (err) throw err;
+        console.table(result);
+    })
+    initialPrompt();
 }
 
-function deleteDept() {
-
+function viewDepts() {
+    connection.query(`SELECT * FROM employee_DB.department`, (err, result) => {
+        if (err) throw err;
+        console.table(result);
+    })
+    initialPrompt();
 }
+
+function exit() {
+    connection.end();
+}
+
+// function removeEmployee() {
+
+// }
+
+// function updateRole() {
+
+// }
+
+// function deleteRole() {
+
+// }
+
+// function updateDept() {
+
+// }
+
+// function deleteDept() {
+
+// }
 
 // SQL QUERY FUNCTIONS -- /END
 
